@@ -24,17 +24,20 @@ namespace rosneuro {
                 Eigen::VectorXf apply(const Eigen::VectorXf& input);
                 bool reset(void);
                 void setAlpha(float value);
-                void setRejection(float value);
+                void setRejection(std::vector<float> values);
+                void setInitPercentual(std::vector<float> init_percentual);
+                std::vector<float> getInitPrecentual(void);
 
             private:
                 Eigen::VectorXf uniformVector(float value);
                 void onRequestReconfigure(rosneuro_config_exponential &config, uint32_t level);
 
                 ros::NodeHandle p_nh_;
-                float alpha_, rejection_;
-                bool has_rejection_;
+                float alpha_;
+                std::vector<float> rejections_;
                 const float alpha_default_ = 0.98f;
                 Eigen::Vector2f data_;
+                std::vector<float> init_percentual_;
 
                 dyncfg_exponential reconfigure_srv_;
                 dyncfg_exponential::CallbackType reconfigure_callback_type_;
