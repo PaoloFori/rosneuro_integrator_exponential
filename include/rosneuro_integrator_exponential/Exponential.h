@@ -3,6 +3,7 @@
 
 #include <Eigen/Dense>
 #include <ros/ros.h>
+#include <numeric>
 #include <pluginlib/class_list_macros.h>
 #include <dynamic_reconfigure/server.h>
 #include <gtest/gtest_prod.h>

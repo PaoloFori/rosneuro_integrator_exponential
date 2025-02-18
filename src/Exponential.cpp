@@ -23,6 +23,17 @@ namespace rosneuro {
             }
             this->setRejection(ths_rejection);
 
+            std::vector<float> init_percentual;
+            if(this->p_nh_.getParam("init_percentual", init_percentual) == false) {
+                ROS_ERROR("[%s] Parameter 'init_percentual' is mandatory", this->name().c_str());
+                return false;
+            }
+            if(static_cast<float>(std::accumulate(init_percentual.begin(), init_percentual.end(), 0.0)) != 1.0f){
+                ROS_ERROR("[%s] Parameter 'init_percentual' must sum to 1.0, it is %f", this->name().c_str(), std::accumulate(init_percentual.begin(), init_percentual.end(), 0.0));
+                return false;
+            }
+            this->setInitPercentual(init_percentual);
+
             this->reconfigure_callback_type_ = boost::bind(&Exponential::onRequestReconfigure, this, _1, _2);
             this->reconfigure_srv_.setCallback(this->reconfigure_callback_type_);
 
@@ -40,7 +51,9 @@ namespace rosneuro {
             if(input(maxIndex) <= this->rejections_.at(maxIndex))
                 return this->data_;
 
-            this->data_ = this->data_ * this->alpha_ + input * (1 - this->alpha_);
+            Eigen::VectorXf new_input = Eigen::VectorXf::Zero(input.size());
+            new_input(maxIndex) = 1.0f;
+            this->data_ = this->data_ * this->alpha_ + new_input * (1 - this->alpha_);
             return this->data_;
         }
 
