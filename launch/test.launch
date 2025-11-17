@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="plugin" default='rosneuro::Exponential'/>
+	<arg name="thresholds" default='[0.7, 0.7]'/>
+	
+	<node name="integrator" pkg="rosneuro_integrator" type="integrator" output="screen" >
+		<param name="plugin" 	  value="$(arg plugin)"/>
+		<rosparam param="thresholds" subst_value="true">$(arg thresholds)</rosparam>
+	</node>
+		
+</launch>

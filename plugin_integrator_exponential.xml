@@ -1,0 +1,5 @@
+<library path="lib/librosneuro_integrator_exponential">
+  <class type="rosneuro::integrator::Exponential" base_class_type="rosneuro::integrator::GenericIntegrator">
+    <description>This is the ROSNeuro Integrator Exponential plugin.</description>
+  </class>
+</library>
