@@ -18,7 +18,7 @@ It is designed to be dynamically loaded by the main `rosneuro_integrator` node. 
 
 To use this plugin, it must be loaded by the `rosneuro_integrator` node, and the smoothing parameter `alpha` must be provided via the command line or a launch file.
 
-* `_plugin:=rosneuro::ExponentialSmoothing` (or the specific C++ class name)
+* `_plugin:=rosneuro::integrator::ExponentialSmoothing` (or the specific C++ class name)
 * `_alpha` (float, 0.0 to 1.0): The smoothing factor.
     * A **high `alpha`** (e.g., 0.99) results in slow changes and heavy smoothing (more "memory").
     * A **low `alpha`** (e.g., 0.1) results in

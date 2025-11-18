@@ -15,17 +15,22 @@ namespace rosneuro {
             this->p_nh_.param<float>("alpha", alpha, this->alpha_default_);
             this->setAlpha(alpha);
 
+            int nclasses;
+            this->p_nh_.param<int>("nclasses", nclasses, 2);
+
             // thresholds rejection probabilities
             std::vector<float> ths_rejection;
-            if(this->p_nh_.getParam("thresholds_rejection", ths_rejection) == false){
-                ROS_ERROR("[%s] Parameter 'thresholds_rejection' is mandatory", this->name().c_str());
+            this->p_nh_.param<std::vector<float>>("thresholds_rejection", ths_rejection, std::vector<float>(2, 0.5f));
+            if(ths_rejection.size() != nclasses){
+                ROS_ERROR("[%s] Parameter 'thresholds_rejection' must have 2 values (2-class problem)", this->name().c_str());
                 return false;
             }
             this->setRejection(ths_rejection);
 
             std::vector<float> init_percentual;
-            if(this->p_nh_.getParam("init_percentual", init_percentual) == false) {
-                ROS_ERROR("[%s] Parameter 'init_percentual' is mandatory", this->name().c_str());
+            this->p_nh_.param<std::vector<float>>("init_percentual", init_percentual, std::vector<float>(2, 0.5f));
+            if(init_percentual.size() != nclasses){
+                ROS_ERROR("[%s] Parameter 'init_percentual' must have 2 values (2-class problem)", this->name().c_str());
                 return false;
             }
             if(static_cast<float>(std::accumulate(init_percentual.begin(), init_percentual.end(), 0.0)) != 1.0f){
@@ -47,16 +52,12 @@ namespace rosneuro {
                 return this->data_;
             }
 
-            /* If low value of the classifier
             Eigen::Index maxIndex;
             input.maxCoeff(&maxIndex);
-            if(input(maxIndex) <= this->rejections_.at(maxIndex))
+            if(input(maxIndex) < this->rejections_.at(maxIndex))
                 return this->data_;
 
-            Eigen::VectorXf new_input = Eigen::VectorXf::Zero(input.size());
-            new_input(maxIndex) = 1.0f;
-            this->data_ = this->data_ * this->alpha_ + new_input * (1 - this->alpha_);
-            */
+
             this->data_ = this->data_ * this->alpha_ + input * (1 - this->alpha_);
             return this->data_;
         }
