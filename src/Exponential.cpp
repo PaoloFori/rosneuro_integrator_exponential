@@ -58,7 +58,10 @@ namespace rosneuro {
                 return this->data_;
 
 
-            this->data_ = this->data_ * this->alpha_ + input * (1 - this->alpha_);
+            Eigen::VectorXf new_input = Eigen::VectorXf::Zero(2);
+            new_input(maxIndex) = 1.0f;
+
+            this->data_ = this->data_ * this->alpha_ + new_input * (1 - this->alpha_);
             return this->data_;
         }
 
