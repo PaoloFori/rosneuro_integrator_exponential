@@ -54,7 +54,7 @@ namespace rosneuro {
 
             Eigen::Index maxIndex;
             input.maxCoeff(&maxIndex);
-            if(input(maxIndex) < this->rejections_.at(maxIndex))
+            if(input(maxIndex) > this->rejections_.at(maxIndex))
                 return this->data_;
 
 
