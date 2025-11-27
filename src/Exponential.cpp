@@ -13,7 +13,6 @@ namespace rosneuro {
         bool Exponential::configure(void) {
             float alpha;
             this->p_nh_.param<float>("alpha", alpha, this->alpha_default_);
-            this->setAlpha(alpha);
 
             int nclasses;
             this->p_nh_.param<int>("nclasses", nclasses, 2);
@@ -25,7 +24,6 @@ namespace rosneuro {
                 ROS_ERROR("[%s] Parameter 'thresholds_rejection' must have 2 values (2-class problem)", this->name().c_str());
                 return false;
             }
-            this->setRejection(ths_rejection);
 
             std::vector<float> init_percentual;
             this->p_nh_.param<std::vector<float>>("init_percentual", init_percentual, std::vector<float>(2, 0.5f));
@@ -37,16 +35,18 @@ namespace rosneuro {
                 ROS_ERROR("[%s] Parameter 'init_percentual' must sum to 1.0, it is %f", this->name().c_str(), std::accumulate(init_percentual.begin(), init_percentual.end(), 0.0));
                 return false;
             }
-            this->setInitPercentual(init_percentual);
 
             this->reconfigure_callback_type_ = boost::bind(&Exponential::onRequestReconfigure, this, _1, _2);
             this->reconfigure_srv_.setCallback(this->reconfigure_callback_type_);
 
+            this->setAlpha(alpha);
+            this->setRejection(ths_rejection);
+            this->setInitPercentual(init_percentual);
+
             return true;
         }
 
-        Eigen::VectorXf Exponential::apply(const Eigen::VectorXf& input) {
-            
+        Eigen::VectorXf Exponential::apply(const Eigen::VectorXf& input) {            
             if(input.size() != 2) {
                 ROS_WARN("[%s] Input size is not 2: only 2-class input is allowed", this->name().c_str());
                 return this->data_;
@@ -54,14 +54,13 @@ namespace rosneuro {
 
             Eigen::Index maxIndex;
             input.maxCoeff(&maxIndex);
-            if(input(maxIndex) > this->rejections_.at(maxIndex))
-                return this->data_;
+            if(input(maxIndex) > this->rejections_.at(maxIndex)){
+                Eigen::VectorXf new_input = Eigen::VectorXf::Zero(2);
+                new_input(maxIndex) = 1.0f;
 
-
-            Eigen::VectorXf new_input = Eigen::VectorXf::Zero(2);
-            new_input(maxIndex) = 1.0f;
-
-            this->data_ = this->data_ * this->alpha_ + new_input * (1 - this->alpha_);
+                this->data_ = this->data_ * this->alpha_ + new_input * (1 - this->alpha_);
+            }
+            
             return this->data_;
         }
 
